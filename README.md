@@ -1,0 +1,9 @@
+- Circle on middle of page with middle line.
+- Have 1 lockpick in the beginning
+- Get 1 lock pick every few time range.
+- Starts out at difficulty Novice
+- Lower Difficulty means more time when attempting unlock (up arrow) and larger circle sector you can attempt in. Also, lower difficulty means lower chance of getting good money.
+- Turn using right and left arrows (when you turn, there is a needle coming out from middle of circle to the edge and it goes around the top semi-circle as you turn).
+- As you unlock locks, increases lock picking level and evenually increases difficulty. LockPicking level allows per unlocks.
+- As you turn to try to unlock, if you use up arrow and you are in wrong sector, will shake the circle, else it will turn the whole circle. As you get closer to the sector, will turn the circle more as you press up.
+- Should have winning-sector and the determining-sector (sector where circle still turns but is not right (but is close)) and the determining-sector is about 50-100% of the winning-sector.
