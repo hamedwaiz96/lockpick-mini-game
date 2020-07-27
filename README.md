@@ -7,3 +7,4 @@
 - As you unlock locks, increases lock picking level and evenually increases difficulty. LockPicking level allows per unlocks.
 - As you turn to try to unlock, if you use up arrow and you are in wrong sector, will shake the circle, else it will turn the whole circle. As you get closer to the sector, will turn the circle more as you press up.
 - Should have winning-sector and the determining-sector (sector where circle still turns but is not right (but is close)) and the determining-sector is about 50-100% of the winning-sector.
+- Difficulties: Novice, Apprentice, Adept, Expert, and Master.
