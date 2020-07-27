@@ -9,8 +9,10 @@
     "build:watch": "vue-cli-service build --watch"
   },
   "dependencies": {
+    "axios": "^0.19.2",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
+    "vue-cookies": "^1.7.3",
     "vue-router": "^3.2.0"
   },
   "devDependencies": {

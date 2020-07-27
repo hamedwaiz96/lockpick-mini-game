@@ -58,7 +58,7 @@ const userSchema = new Schema({
     timestamps: true
 });
 
-userSchema.pre('save', () => {
+userSchema.pre('save', function(next) {
     const user = this;
 
     if(!user.isModified('password')) {return next()};
@@ -76,8 +76,8 @@ userSchema.pre('save', () => {
 
 userSchema.methods.comparePassword = function(candidatePassword, callback) {
     bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
-        if (err) {return callback(err)};
-        callback(null, isMatch);
+        if (err) {return callback(err)}
+        callback(null, isMatch)
     });
 };
 

@@ -4,17 +4,28 @@ const path = require('path');
 const port = 3000
 const mongoose = require('mongoose');
 const api = require('./router/api');
+const cookieSession = require('cookie-session');
+const passport = require('passport')
+const cors = require('cors')
 
 require('dotenv').config();
 
 app.use(express.json());
+app.use(cors())
+app.use(cookieSession({
+    name: 'mysession',
+    keys: ['vueauthrandomkey'],
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
+app.use(passport.initialize());
+app.use(passport.session());
 app.use('/api', api);
-app.use('/dist', express.static(path.join(__dirname, './client/dist')));
 
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Credentials", true)
             //intercepts OPTIONS method
     if ('OPTIONS' === req.method) {
       //respond with 200
@@ -24,13 +35,6 @@ app.use(function (req, res, next) {
     //move on
       next();
     };
-})
-
-app.get('/', (req, res) => res.send('Hello World!'))
-
-// Will eventually not have this and just use index.js as api and use vue server as the offical one.
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, './client/dist/index.html'));
 })
 
 const uri = process.env.ATLAS_URI;
