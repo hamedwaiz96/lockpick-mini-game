@@ -33,7 +33,7 @@ class Lockpick {
 		const sectorDifference = radius - this.sectorXLength;
 		const startXSector = LockPick.randomInteger(-sectorDifference, sectorDifference);
 		const dir = randomInteger(0, 1);
-		return ((dir === 0) ? [startXSector - this.sectorXLength, startXSector] : [startXSector, startXSector + this.sectorXLength])
+		return (!!dir ? [startXSector - this.sectorXLength, startXSector] : [startXSector, startXSector + this.sectorXLength])
 	}
 
 	static randomInteger(min, max) {
