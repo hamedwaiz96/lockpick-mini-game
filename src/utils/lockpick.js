@@ -13,7 +13,7 @@ const DIFFICULTY_X_LENGTH_MAP = {
 	"Master": convertAngleToXLength(4, startPosition[1])
 }
 
-class Lockpick() {
+class Lockpick {
 	constructor() {
 		const self = this;
 		// [x, y]
