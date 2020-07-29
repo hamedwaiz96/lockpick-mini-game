@@ -1,9 +1,9 @@
 function convertAngleToXLength(angle, radius) {
-	const radians = (angle*Math.PI)/180
-	return radius*sin(radians)
+	const radians = (angle*Math.PI)/180;
+	return radius*Math.sin(radians);
 }
 
-const startPosition = [0, 100]
+const startPosition = [0, 100];
 
 const DIFFICULTY_X_LENGTH_MAP = {
 	"Novice": convertAngleToXLength(12, startPosition[1]),
@@ -17,10 +17,10 @@ class Lockpick {
 	constructor() {
 		const self = this;
 		// [x, y]
-		const startPos = startPosition
-		const endPos1 = [startPosition[1], startPosition[0]]
-		const endPos2 = [-startPosition[1], startPosition[0]]
-		this.currentPos = startPosition
+		const startPos = startPosition;
+		const endPos1 = [startPosition[1], startPosition[0]];
+		const endPos2 = [-startPosition[1], startPosition[0]];
+		this.currentPos = startPosition;
 		this.lockpicks = 100;
 		this.difficulty = "Novice";
 		this.sectorXLength = DIFFICULTY_X_LENGTH_MAP[this.difficulty];
@@ -32,11 +32,11 @@ class Lockpick {
 		const radius = this.startPos[1];
 		const sectorDifference = radius - this.sectorXLength;
 		const startXSector = LockPick.randomInteger(-sectorDifference, sectorDifference);
-		const dir = randomInteger(0, 1);
-		return (!!dir ? [startXSector - this.sectorXLength, startXSector] : [startXSector, startXSector + this.sectorXLength])
+		const dir = LockPick.randomInteger(0, 1);
+		return (!!dir ? [startXSector - this.sectorXLength, startXSector] : [startXSector, startXSector + this.sectorXLength]);
 	}
 
 	static randomInteger(min, max) {
-  		return Math.floor(Math.random() * (max - min + 1)) + min;
-	}
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 }
