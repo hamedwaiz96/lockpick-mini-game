@@ -1,5 +1,4 @@
 const express = require('express');
-const game = require('../src/utils/game').default;
 const User = require('../src/models/user');
 
 const passport = require('passport');
