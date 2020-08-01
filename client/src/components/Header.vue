@@ -1,31 +1,44 @@
 <template>
   <div class="header-con">
-    <router-link to="/register">Sign Up</router-link>
-    <router-link to="/login">Login</router-link>
-    <button v-on:click="logout">Logout</button>
+    <div v-if="this.user === ''">
+      <router-link to="/register">Sign Up</router-link>
+      <router-link to="/login">Login</router-link>
+    </div>
+    <button v-if="this.user !== ''" v-on:click="logout">Logout</button>
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from 'vue'
-import axios from 'axios'
 import router from '../router/index'
-// import Authentication from '../services/Authentication'
+import Authentication from '../services/Authentication'
 
 export default Vue.extend({
   name: 'Header',
+  data () {
+    return {
+      user: ''
+    }
+  },
   methods: {
     logout () {
-      // Authentication.logout()
-      //   .then(() => {
-      //     router.push('/')
-      //   })
-      axios
-        .get('/api/logout')
+      Authentication.logout()
         .then(() => {
+          localStorage.removeItem('jwt')
+          localStorage.removeItem('user')
           router.push('/')
         })
+    },
+    getUserData: function () {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const self = this
+      if (localStorage.getItem('jwt') !== null) {
+        self.$set(this, 'user', localStorage.getItem('user'))
+      }
     }
+  },
+  mounted () {
+    this.getUserData()
   }
 })
 </script>

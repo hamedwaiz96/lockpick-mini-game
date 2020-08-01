@@ -1,100 +1,97 @@
 const express = require('express');
-const utils = require('../src/utils/circle');
+const game = require('../src/utils/game').default;
 const User = require('../src/models/user');
-const passport = require('passport');
 
-const LocalStrategy = require('passport-local').Strategy
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const passportJWT = require('passport-jwt');
+const jwt = require('jsonwebtoken');
+const JWTStrategy = passportJWT.Strategy;
+
+const secret = "12345";
+
+passport.use(new LocalStrategy({
+  usernameField: 'username',
+  passwordField: 'password',
+}, async (username, password, done) => {
+    const userDocument = await User.findOne({username: username}).exec();
+    userDocument.comparePassword(password, (err, isMatch) => {
+      console.log(isMatch)
+      if (isMatch) {
+        return done(null, userDocument);
+      } else if (err) {
+        return done(err);
+      } else {
+        return done('Incorrect Username / Password')
+      }
+    })
+}));
+
+passport.use(new JWTStrategy({
+    jwtFromRequest: req => req.cookies.jwt,
+    secretOrKey: secret,
+  },
+  (jwtPayload, done) => {
+    if (Date.now() > jwtPayload.expires) {
+      return done('jwt expired');
+    }
+
+    return done(null, jwtPayload);
+  }
+));
 
 const router = express.Router();
 
-const authMiddleware = (req, res, next) => {
-    if (!req.isAuthenticated()) {
-      res.status(401).send('You are not authenticated')
-    } else {
-      return next()
-    }
-}
-
-router.post('/register', (req, res, next) => {
+router.post('/register', (req, res) => {
     const newUser = new User(req.body)
-    newUser.save().then((data) => {
-        passport.authenticate("local", (err, user, info) => {
-            if (err) {
-              return next(err);
-            }
-        
-            if (!user) {
-              return res.status(400).send([user, "Cannot log in", info]);
-            }
-        
-            req.login(user, err => {
-                console.log('logged in')
-              res.send("Logged in");
-            });
-        })(req, res, next);
-    }).catch((err) => res.json({err}))
+    newUser.save().then((user) => {
+      let token = jwt.sign({ id: user.id }, secret, { expiresIn: 86400 // expires in 24 hours
+      });
+      res.status(200).send({ auth: true, token: token, user: user });
+    }).catch((err) => {
+      res.status(400).json({err: err})
+    })
 })
 
-router.post('/login', (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
-        if (err) {
-          return next(err);
+router.post('/login', (req, res) => {
+    // find user from req.body.username and then compare password
+    passport.authenticate(
+      'local',
+      { session: false },
+      (error, user) => {
+        if (error || !user) {
+          res.status(400).json({ error });
         }
-    
-        if (!user) {
-          return res.status(400).send([user, "Cannot log in", info]);
-        }
-    
-        req.login(user, err => {
-          res.send("Logged in");
+        /** This is what ends up in our JWT */
+        const expiration_ms = 1000 * 60 * 60 * 24;
+        const payload = {
+          id: user.id,
+          expires: Date.now() + parseInt(expiration_ms),
+        };
+        /** assigns payload to req.user */
+        req.login(payload, {session: false}, (error) => {
+          if (error) {
+            res.status(400).send({ error });
+          }
+          /** generate a signed json web token and return it in the response */
+          const token = jwt.sign(JSON.stringify(payload), secret);
+          /** assign our jwt to the cookie */
+          res.cookie('jwt', token, { httpOnly: true });
+          res.status(200).send({ auth: true, token: token, user: user });
         });
-    })(req, res, next);
+      },
+    )(req, res);
 })
 
 router.get('/logout', function(req, res) {
-    req.logout();
   
     console.log("logged out")
   
-    return res.send();
+    return res.json({message: "successfully logged out"});
 });
 
-router.get('/user', authMiddleware, (req, res) => {
-    let user = User.findOne({id: req.session.passport.user})
-
-    res.send({ user: user })
-})
-
-passport.use(
-    new LocalStrategy(
-      {
-        usernameField: "username",
-        passwordField: "password"
-      },
-  
-      function(username, password, done) {
-          const self = this
-        User.findOne({username: username}, (err, user) => {
-        if (user) {
-            user.comparePassword(password, function(err, isMatch) {
-                if (err) throw err
-                else if (isMatch) {done(null, user)} else done(null, false, { message: 'Incorrect username or password'})
-            })
-        } else {
-            done(null, false, { message: 'Incorrect username or password'})
-        }
-        })
-      }
-    )
-)
-
-passport.serializeUser((user, done) => {
-    done(null, user.id)
-})
-
-passport.deserializeUser((userId, done) => {
-    let findUser = User.findOne({id: userId})
-    done(null, findUser)
+router.get('/user', (req, res) => {
+  res.json({user: req.cookies.jwt})
 })
 
 module.exports = router;

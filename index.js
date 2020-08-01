@@ -4,21 +4,15 @@ const path = require('path');
 const port = 3000
 const mongoose = require('mongoose');
 const api = require('./router/api');
-const cookieSession = require('cookie-session');
-const passport = require('passport')
 const cors = require('cors')
 
 require('dotenv').config();
 
 app.use(express.json());
 app.use(cors())
-app.use(cookieSession({
-    name: 'mysession',
-    keys: ['vueauthrandomkey'],
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
-app.use(passport.initialize());
-app.use(passport.session());
+const publicRoot = path.join(__dirname, './client/dist')
+
+app.use(express.static(publicRoot))
 app.use('/api', api);
 
 app.use(function (req, res, next) {
@@ -35,6 +29,10 @@ app.use(function (req, res, next) {
     //move on
       next();
     };
+})
+
+app.get("/", (req, res, next) => {
+  res.sendFile("index.html", { root: publicRoot })
 })
 
 const uri = process.env.ATLAS_URI;

@@ -38,7 +38,27 @@ export default Vue.extend({
       inputs.forEach((el) => {
         formData[el.name] = el.value
       })
-      if (this.AuthType === 'Register') { Authentication.register(formData).then(({ data }) => router.push('/')).catch((err) => console.log(err)) } else { Authentication.login(formData).then(({ data }) => router.push('/')).catch((err) => console.log(err)) }
+      if (this.AuthType === 'Register') {
+        Authentication.register(formData)
+          .then((response) => {
+            localStorage.setItem('user', JSON.stringify(response.data.user))
+            localStorage.setItem('jwt', response.data.token)
+            router.push('/')
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      } else {
+        Authentication.login(formData)
+          .then((response) => {
+            localStorage.setItem('user', JSON.stringify(response.data.user))
+            localStorage.setItem('jwt', response.data.token)
+            router.push('/')
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      }
     }
   }
 })

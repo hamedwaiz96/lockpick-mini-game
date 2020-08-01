@@ -1,6 +1,17 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png">
+    <canvas id="canvas"></canvas>
+    <div v-if="this.user !== ''">
+        <div>
+            <h3>Difficulty: {{this.game.lockpick.difficulty}}</h3>
+            <h3>Lockpicks: {{this.user.lockpicks}}</h3>
+            <h3>Money: {{this.user.money}}</h3>
+        </div>
+        <h3>
+            <span class="received-num"></span>
+        </h3>
+    </div>
   </div>
 </template>
 
@@ -8,35 +19,26 @@
 // @ is an alias to /src
 import router from '../router/index'
 import Authentication from '../services/Authentication'
+import Game from '../services/game'
 
 export default {
   name: 'Home',
   data () {
     return {
-      user: {
-        username: 'Default',
-        password: 'Default',
-        level: 'Novice',
-        exp: 0,
-        unlocks: 0,
-        money: 0,
-        lockpicks: 0,
-        profilePicUrl: 'https://t4.ftcdn.net/jpg/00/64/67/63/240_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg'
-      }
+      user: '',
+      game: ''
     }
   },
   methods: {
     getUserData: function () {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const self = this
-      Authentication.user()
-        .then((response) => {
-          self.$set(self, 'user', response.data.user)
-        })
-        .catch((errors) => {
-          console.log(errors)
-          router.push('/')
-        })
+      if (localStorage.getItem('jwt') !== null) {
+        self.$set(this, 'user', JSON.parse(localStorage.getItem('user')))
+        console.log(this.user.lockpicks)
+        const game = new Game(this.user)
+        self.$set(this, 'game', game)
+      }
     }
   },
   mounted () {
